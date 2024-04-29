@@ -37,12 +37,13 @@ func (m Model) View() string {
 
 func main() {
 	items := []picker.Item{
-		{Key: "Prasanth", Value: "1"},
-		{Key: "Delara", Value: "2"},
-		{Key: "Louis", Value: "3"},
-		{Key: "Emmanuel", Value: "4"},
+		{Key: "Alpha", Value: "1"},
+		{Key: "Bravo", Value: "2"},
+		{Key: "Charlie", Value: "3"},
+		{Key: "Delta", Value: "4"},
 	}
 	input := Model{linpick: picker.New(items)}
+	input.linpick.SetCursor("3")
 	p := tea.NewProgram(input)
 	m, err := p.Run()
 	if err != nil {

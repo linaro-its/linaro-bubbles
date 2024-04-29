@@ -9,11 +9,15 @@ type Item struct {
 
 type Model struct {
 	cursor int
+	empty  string
 	items  []Item
 }
 
 func (m Model) View() string {
 	if len(m.items) == 0 {
+		if m.empty != "" {
+			return m.empty
+		}
 		return "no items"
 	}
 	// Render the currently selected item
@@ -42,12 +46,27 @@ func (m Model) Cursor() int {
 	return m.cursor
 }
 
+func (m *Model) SetCursor(value string) {
+	// Set the cursor by finding the specified value
+	// in the list.
+	for i := 0; i < len(m.items); i++ {
+		if m.items[i].Value == value {
+			m.cursor = i
+			break
+		}
+	}
+}
+
 func (m Model) Items() []Item {
 	return m.items
 }
 
 func (m *Model) SetItems(i []Item) {
 	m.items = i
+}
+
+func (m *Model) SetEmpty(i string) {
+	m.empty = i
 }
 
 func New(items []Item) Model {
