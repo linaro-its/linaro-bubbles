@@ -1,6 +1,10 @@
 package picker
 
-import tea "github.com/charmbracelet/bubbletea"
+import (
+	"fmt"
+
+	tea "github.com/charmbracelet/bubbletea"
+)
 
 type Item struct {
 	Key   string
@@ -46,15 +50,17 @@ func (m Model) Cursor() int {
 	return m.cursor
 }
 
-func (m *Model) SetCursor(value string) {
+func (m *Model) SetCursor(value string) error {
 	// Set the cursor by finding the specified value
 	// in the list.
 	for i := 0; i < len(m.items); i++ {
 		if m.items[i].Value == value {
 			m.cursor = i
-			break
+			return nil
 		}
 	}
+
+	return fmt.Errorf("failed to match value '%s'", value)
 }
 
 func (m Model) Items() []Item {
