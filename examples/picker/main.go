@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"linaro-bubbles/picker"
 	"os"
+
+	"github.com/linaro-its/linaro-bubbles/picker"
 
 	tea "github.com/charmbracelet/bubbletea"
 )

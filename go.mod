@@ -1,4 +1,4 @@
-module linaro-bubbles
+module github.com/linaro-its/linaro-bubbles
 
 go 1.22.1
 
