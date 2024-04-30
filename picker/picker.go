@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type Item struct {
@@ -12,23 +13,35 @@ type Item struct {
 }
 
 type Model struct {
-	cursor int
-	empty  string
-	items  []Item
+	cursor      int
+	focus       bool
+	empty       string
+	items       []Item
+	Prompt      string
+	TextStyle   lipgloss.Style
+	PromptStyle lipgloss.Style
 }
 
 func (m Model) View() string {
+	var value string
 	if len(m.items) == 0 {
 		if m.empty != "" {
-			return m.empty
+			value = m.empty
+		} else {
+			value = "no items"
 		}
-		return "no items"
+	} else {
+		value = m.items[m.cursor].Key
 	}
-	// Render the currently selected item
-	return m.items[m.cursor].Key
+
+	return m.PromptStyle.Render(m.Prompt) + m.TextStyle.Render(value)
 }
 
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+	if !m.focus {
+		return m, nil
+	}
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -63,6 +76,14 @@ func (m *Model) SetCursor(value string) error {
 	return fmt.Errorf("failed to match value '%s'", value)
 }
 
+func (m *Model) Focus() {
+	m.focus = true
+}
+
+func (m *Model) Blur() {
+	m.focus = false
+}
+
 func (m Model) Items() []Item {
 	return m.items
 }
@@ -78,6 +99,7 @@ func (m *Model) SetEmpty(i string) {
 func New(items []Item) Model {
 	m := Model{
 		cursor: 0,
+		focus:  false,
 		items:  items,
 	}
 	return m
