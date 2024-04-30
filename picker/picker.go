@@ -63,6 +63,13 @@ func (m Model) Cursor() int {
 	return m.cursor
 }
 
+func (m Model) Value() string {
+	if len(m.items) == 0 {
+		return ""
+	}
+	return m.items[m.cursor].Value
+}
+
 func (m *Model) SetCursor(value string) error {
 	// Set the cursor by finding the specified value
 	// in the list.
