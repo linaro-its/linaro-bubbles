@@ -37,9 +37,9 @@ func (m Model) View() string {
 	return m.PromptStyle.Render(m.Prompt) + m.TextStyle.Render(value)
 }
 
-func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+func (m *Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	if !m.focus {
-		return m, nil
+		return *m, nil
 	}
 
 	switch msg := msg.(type) {
@@ -56,7 +56,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		}
 	}
 
-	return m, nil
+	return *m, nil
 }
 
 func (m Model) Cursor() int {
@@ -96,6 +96,7 @@ func (m Model) Items() []Item {
 }
 
 func (m *Model) SetItems(i []Item) {
+	m.cursor = 0
 	m.items = i
 }
 
