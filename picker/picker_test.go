@@ -2,6 +2,8 @@ package picker
 
 import (
 	"testing"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 const NoValuesProvided = "no values provided"
@@ -73,5 +75,44 @@ func TestEverything(t *testing.T) {
 		if items[i].Value != return_items[i].Value {
 			t.Errorf("Items: index %d value is %s; expected %s", i, return_items[i].Value, items[i].Value)
 		}
+	}
+	// Set cursor to zero and try to move left. Nothing should happen.
+	input.cursor = 0
+	k := tea.KeyMsg{Type: tea.KeyLeft}
+	model, cmd := input.Update(k)
+	if cmd != nil {
+		t.Errorf("Update returned non-nil command")
+	}
+	if model.cursor != 0 {
+		t.Errorf("Update returned model with cursor of %d; expected 0", model.cursor)
+	}
+	// Set cursor to one and try to move left. Should go to zero.
+	input.cursor = 1
+	model, cmd = input.Update(k)
+	if cmd != nil {
+		t.Errorf("Update returned non-nil command")
+	}
+	if model.cursor != 0 {
+		t.Errorf("Update returned model with cursor of %d; expected 0", model.cursor)
+	}
+	// Reset cursor to zero and try moving right. Should go to one.
+	input.cursor = 0
+	k = tea.KeyMsg{Type: tea.KeyRight}
+	model, cmd = input.Update(k)
+	if cmd != nil {
+		t.Errorf("Update returned non-nil command")
+	}
+	if model.cursor != 1 {
+		t.Errorf("Update returned model with cursor of %d; expected 1", model.cursor)
+	}
+	// Finally, go to the end of the list and try moving right.
+	endpoint := len(input.items) - 1
+	input.cursor = endpoint
+	model, cmd = input.Update(k)
+	if cmd != nil {
+		t.Errorf("Update returned non-nil command")
+	}
+	if model.cursor != endpoint {
+		t.Errorf("Update returned model with cursor of %d; expected %d", model.cursor, endpoint)
 	}
 }
