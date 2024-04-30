@@ -18,6 +18,27 @@ func TestEverything(t *testing.T) {
 		{Key: "Delta", Value: "4"},
 	}
 	input := New(items)
+	if input.focus || input.cursor != 0 {
+		t.Errorf("New failed to correctly initialise focus or cursor")
+	}
+	// Focus starts off false when we create the item so switch ...
+	input.Focus()
+	if !input.focus {
+		t.Errorf("Focus failed to set focus true")
+	}
+	// Now revert
+	input.Blur()
+	if input.focus {
+		t.Errorf("Blur failed to set focus false")
+	}
+	// While blurred, Update shouldn't do anything
+	k := tea.KeyMsg{Type: tea.KeyLeft}
+	model, cmd := input.Update(k)
+	if cmd != nil {
+		t.Errorf("Blurred update returned non-nil command")
+	}
+	// Go back to Focussed so that Update works
+	input.Focus()
 	// We should have an array of 4 items
 	if len(input.items) != len(items) {
 		t.Errorf("Init list length = %d; expected %d", len(input.items), len(items))
@@ -40,6 +61,11 @@ func TestEverything(t *testing.T) {
 	result = input.View()
 	if result != NoValuesProvided {
 		t.Errorf("Empty View returned '%s'; expected '%s'", result, NoValuesProvided)
+	}
+	// Check the behavior of Value on an empty list
+	v := input.Value()
+	if v != "" {
+		t.Errorf("Empty Value returned '%s'; expected empty string", v)
 	}
 	// Reset the items
 	input.SetItems(items)
@@ -78,8 +104,8 @@ func TestEverything(t *testing.T) {
 	}
 	// Set cursor to zero and try to move left. Nothing should happen.
 	input.cursor = 0
-	k := tea.KeyMsg{Type: tea.KeyLeft}
-	model, cmd := input.Update(k)
+	k = tea.KeyMsg{Type: tea.KeyLeft}
+	model, cmd = input.Update(k)
 	if cmd != nil {
 		t.Errorf("Update returned non-nil command")
 	}
@@ -114,5 +140,10 @@ func TestEverything(t *testing.T) {
 	}
 	if model.cursor != endpoint {
 		t.Errorf("Update returned model with cursor of %d; expected %d", model.cursor, endpoint)
+	}
+	// Check that calling Value gives us the last entry
+	v = input.Value()
+	if v != items[len(items)-1].Value {
+		t.Errorf("Value returned '%s'; expected '%s'", v, items[len(items)-1].Value)
 	}
 }
